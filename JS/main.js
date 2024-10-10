@@ -1,74 +1,60 @@
-// Constantes para el conversor de moneda
-const conversionRates = {
-    USD: 1,        // Base en dólares
-    EUR: 0.95,     // Tasa de conversión de USD a EUR
-    MXN: 18.00     // Tasa de conversión de USD a MXN
-};
-
-// Productos disponibles en la tienda (array de objetos)
-let productos = [
-    { nombre: 'Camisa', precio: 25 },
-    { nombre: 'Pantalones', precio: 40 },
-    { nombre: 'Zapatos', precio: 60 },
-    { nombre: 'Sombrero', precio: 20 }
-];
-
-// Carrito de compras (array)
-let carrito = [];
-
-// Función para mostrar los productos
-function mostrarProductos() {
-    console.log("Productos disponibles:");
-    productos.forEach((producto, index) => {
-        console.log(`${index + 1}. ${producto.nombre} - $${producto.precio} USD`);
+// Constantes
+const TASAS_CAMBIO = {
+    USD: 1,
+    EUR: 0.88,
+    GBP: 0.76,
+    ARS: 65.50
+  };
+  
+  const PRODUCTOS = [
+    { id: 1, nombre: "Producto 1", precioUSD: 10 },
+    { id: 2, nombre: "Producto 2", precioUSD: 20 },
+    { id: 3, nombre: "Producto 3", precioUSD: 30 }
+  ];
+  
+  // Variables
+  let carrito = [];
+  let monedaSeleccionada = "USD";
+  let total = 0;
+  
+  // Funciones
+  function convertirMoneda(monto, monedaOrigen, monedaDestino) {
+    return monto * TASAS_CAMBIO[monedaDestino] / TASAS_CAMBIO[monedaOrigen];
+  }
+  
+  function agregarAlCarrito(producto) {
+    carrito.push(producto);
+    calcularTotal();
+  }
+  
+  function calcularTotal() {
+    total = 0;
+    carrito.forEach(producto => {
+      total += convertirMoneda(producto.precioUSD, "USD", monedaSeleccionada);
     });
-}
-
-// Función para agregar productos al carrito
-function agregarAlCarrito(indiceProducto) {
-    if (indiceProducto >= 0 && indiceProducto < productos.length) {
-        carrito.push(productos[indiceProducto]);
-        console.log(`Has agregado ${productos[indiceProducto].nombre} al carrito.`);
-    } else {
-        console.log("Producto no válido.");
-    }
-}
-
-// Función para calcular el total del carrito en la moneda seleccionada
-function calcularTotal(moneda) {
-    let totalUSD = carrito.reduce((total, producto) => total + producto.precio, 0);
-    let totalConvertido = totalUSD * conversionRates[moneda];
-    console.log(`El total en ${moneda} es: ${totalConvertido.toFixed(2)} ${moneda}`);
-}
-
-// Función principal del simulador
-function iniciarSimulador() {
-    let continuar = true;
-    while (continuar) {
-        mostrarProductos();
-
-        // Solicitar al usuario que elija un producto
-        let seleccion = prompt("Selecciona el número del producto que deseas agregar al carrito o escribe 'fin' para terminar:");
-        
-        if (seleccion.toLowerCase() === 'fin') {
-            continuar = false;
-        } else {
-            let indice = parseInt(seleccion) - 1;
-            agregarAlCarrito(indice);
-        }
-    }
-
-    let moneda = prompt("¿En qué moneda deseas ver el total? (USD, EUR, MXN):").toUpperCase();
-    
-    if (conversionRates[moneda]) {
-        calcularTotal(moneda);
-    } else {
-        console.log("Moneda no válida. Mostrando total en USD por defecto.");
-        calcularTotal('USD');
-    }
-
-    console.log("Gracias por comprar en nuestra tienda.");
-}
-
-// Iniciar el simulador
-iniciarSimulador();
+    actualizarInterfaz();
+  }
+  
+  function actualizarInterfaz() {
+    document.getElementById("total").innerText = `Total: ${total.toFixed(2)} ${monedaSeleccionada}`;
+    document.getElementById("carrito").innerHTML = "";
+    carrito.forEach(producto => {
+      const elemento = document.createElement("li");
+      elemento.innerText = `${producto.nombre} - ${convertirMoneda(producto.precioUSD, "USD", monedaSeleccionada).toFixed(2)} ${monedaSeleccionada}`;
+      document.getElementById("carrito").appendChild(elemento);
+    });
+  }
+  
+  // Eventos
+  document.getElementById("moneda").addEventListener("change", evento => {
+    monedaSeleccionada = evento.target.value;
+    calcularTotal();
+  });
+  
+  document.getElementById("agregar").addEventListener("click", evento => {
+    const productoSeleccionado = PRODUCTOS.find(producto => (link unavailable) === parseInt(document.getElementById("producto").value));
+    agregarAlCarrito(productoSeleccionado);
+  });
+  
+  // Inicialización
+  calcularTotal();
